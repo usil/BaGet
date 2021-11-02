@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
@@ -13,6 +13,7 @@ namespace BaGet.Web
     public class IndexModel : PageModel
     {
         private readonly ISearchService _search;
+        private readonly AuthenticationHelper _authenticationHelper = new AuthenticationHelper();
 
         public IndexModel(ISearchService search)
         {
@@ -41,6 +42,9 @@ namespace BaGet.Web
 
         public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
         {
+            var errorResult = _authenticationHelper.getAuthenticationError(Request.Headers,Response);
+            if (errorResult!=null) return errorResult;
+
             if (!ModelState.IsValid) return BadRequest();
 
             var packageType = PackageType == "any" ? null : PackageType;
